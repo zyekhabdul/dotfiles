@@ -1,0 +1,262 @@
+bar:
+  location: top
+  height: 30
+  background: 000000ff
+  font: "JetBrainsMono Nerd Font:pixelsize=14"
+  foreground: ffffffff
+  spacing: 4
+  margin: 0
+
+  left:
+    - cpu:
+        poll-interval: 2000
+        content:
+          map:
+            conditions:
+              id < 0:
+                map:
+                  conditions:
+                    cpu >= 90:
+                      string:
+                        on-click: foot -e htop
+                        deco: {background: {color: ff0000ff}}
+                        foreground: ffffffff
+                        text: " CPU {cpu}%"
+                    cpu >= 70:
+                      string:
+                        on-click: foot -e htop
+                        foreground: ffff00ff
+                        text: " CPU {cpu}%"
+                  default:
+                    string:
+                      on-click: foot -e htop
+                      foreground: ffffffff
+                      text: " CPU {cpu}%"
+    - label:
+        content:
+          string:
+            foreground: 333333ff
+            text: "│"
+    - mem:
+        poll-interval: 5000
+        content:
+          map:
+            conditions:
+              percent_used >= 90:
+                string:
+                  deco: {background: {color: ff0000ff}}
+                  foreground: ffffffff
+                  text: " RAM {percent_used}%"
+              percent_used >= 70:
+                string:
+                  foreground: ffff00ff
+                  text: " RAM {percent_used}%"
+            default:
+              string:
+                foreground: ffffffff
+                text: " RAM {percent_used}%"
+    - label:
+        content:
+          string:
+            foreground: 333333ff
+            text: "│"
+    - script:
+        path: /bin/sh
+        args:
+          - -c
+          - |
+            echo "swap|string|$(free -m | awk '/^Swap:/ {if ($2==0) print "-"; else printf "%.0f%%", ($3/$2)*100}')"
+            echo ""
+        poll-interval: 5000
+        content:
+          string:
+            foreground: aaaaaaff
+            text: " SWAP {swap}"
+    - label:
+        content:
+          string:
+            foreground: 333333ff
+            text: "│"
+    - script:
+        path: /bin/sh
+        args:
+          - -c
+          - |
+            usage=$(df -k / | awk 'NR==2 {gsub(/%/, "", $(NF-1)); print $(NF-1)}')
+            echo "disk|string| DISK ${usage}%"
+            echo ""
+        poll-interval: 30000
+        content:
+          string: {foreground: ffffffff, text: "{disk}"}
+    - label:
+        content:
+          string:
+            foreground: 333333ff
+            text: "│"
+    - script:
+        path: /bin/sh
+        args:
+          - -c
+          - |
+            temp=$(( $(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0) / 1000 ))
+            echo "temp|string| TEMP ${temp}°C"
+            echo ""
+        poll-interval: 2000
+        content:
+          string: {foreground: ffffffff, text: "{temp}"}
+    - label:
+        content:
+          string:
+            foreground: 333333ff
+            text: "│"
+    - script:
+        path: /bin/sh
+        args:
+          - -c
+          - |
+            load=$(uptime | awk -F'load average: ' '{split($2,a,", "); printf "%s %s %s", a[1], a[2], a[3]}')
+            echo "load|string|$load"
+            echo ""
+        poll-interval: 5000
+        content:
+          string:
+            foreground: ffffffff
+            text: " {load}"
+
+  center:
+    - clock:
+        time-format: "%a, %d %b - %H:%M"
+        content:
+          string:
+            margin: 10
+            foreground: ffffffff
+            text: "{time}"
+
+  right:
+    - script:
+        path: /bin/sh
+        args:
+          - -c
+          - |
+            eth_state=$(cat /sys/class/net/enp0s25/operstate 2>/dev/null)
+            if [ "$eth_state" = "up" ]; then
+              echo "net|string|󰈀"
+            else
+              state=$(cat /sys/class/net/wlan0/operstate 2>/dev/null)
+              if [ "$state" = "up" ]; then
+                ssid=$(iw dev wlan0 link 2>/dev/null | awk -F': ' '/SSID/ {print $2}')
+                [ -z "$ssid" ] && ssid=$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1=="yes"{print $2}')
+                if [ -n "$ssid" ]; then
+                  echo "net|string| $ssid"
+                else
+                  echo "net|string|"
+                fi
+              else
+                echo "net|string|󰖪"
+              fi
+            fi
+            echo ""
+        poll-interval: 3000
+        content:
+          string:
+            margin: 4
+            max: 16
+            foreground: ffffffff
+            text: "{net}"
+            on-click: foot -e nmtui
+    - script:
+        path: /bin/sh
+        args:
+          - -c
+          - |
+            if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
+              dev=$(bluetoothctl devices Connected 2>/dev/null | head -n 1 | cut -d ' ' -f 3-)
+              if [ -n "$dev" ]; then
+                echo "bt|string|󰂯 $dev"
+              else
+                echo "bt|string|󰂯"
+              fi
+            else
+              echo "bt|string|󰂲"
+            fi
+            echo ""
+        poll-interval: 3000
+        content:
+          string: {margin: 4, max: 16, foreground: ffffffff, text: "{bt}", on-click: foot -e bluetoothctl}
+    - pulse:
+        content:
+          map:
+            on-click:
+              left: pamixer -t
+              wheel-up: pamixer -i 1
+              wheel-down: pamixer -d 1
+            conditions:
+              sink_muted:
+                string:
+                  margin: 4
+                  text: "󰝟"
+              ~sink_muted:
+                ramp:
+                  tag: sink_percent
+                  items:
+                    - string: {margin: 4, text: "󰕿 {sink_percent}%"}
+                    - string: {margin: 4, text: "󰖀 {sink_percent}%"}
+                    - string: {margin: 4, text: "󰕾 {sink_percent}%"}
+    - pulse:
+        content:
+          map:
+            on-click:
+              left: pamixer --default-source -t
+              wheel-up: pamixer --default-source -i 1
+              wheel-down: pamixer --default-source -d 1
+            conditions:
+              source_muted:
+                string:
+                  margin: 4
+                  text: "󰍭 Muted"
+              ~source_muted:
+                string:
+                  margin: 4
+                  text: "󰍬 {source_percent}%"
+    - battery:
+        name: BAT0
+        poll-interval: 5000
+        content:
+          map:
+            conditions:
+              state == "charging":
+                ramp:
+                  tag: capacity
+                  items:
+                    - string: {margin: 4, text: "󱐋 󰂎 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁺 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁻 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁼 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁽 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁾 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁿 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁀 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁁 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁂 {capacity}%"}
+                    - string: {margin: 4, text: "󱐋 󰁹 {capacity}%"}
+              capacity < 15:
+                string:
+                  margin: 4
+                  deco: {background: {color: ff0000ff}}
+                  foreground: ffffffff
+                  text: "󰂃 {capacity}%"
+            default:
+              ramp:
+                tag: capacity
+                items:
+                  - string: {margin: 4, text: "󰂎 {capacity}%"}
+                  - string: {margin: 4, text: "󰁺 {capacity}%"}
+                  - string: {margin: 4, text: "󰁻 {capacity}%"}
+                  - string: {margin: 4, text: "󰁼 {capacity}%"}
+                  - string: {margin: 4, text: "󰁽 {capacity}%"}
+                  - string: {margin: 4, text: "󰁾 {capacity}%"}
+                  - string: {margin: 4, text: "󰁿 {capacity}%"}
+                  - string: {margin: 4, text: "󰁀 {capacity}%"}
+                  - string: {margin: 4, text: "󰁁 {capacity}%"}
+                  - string: {margin: 4, text: "󰁂 {capacity}%"}
+                  - string: {margin: 4, text: "󰁹 {capacity}%"}

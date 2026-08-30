@@ -1,0 +1,14 @@
+[user]
+	email = zyekhabdulqadirjailani@gmail.com
+	name = zyekhabdul
+[init]
+	templateDir = /home/fuckadmin/.git-templates
+[url "git@gitlab.com:"]
+	insteadOf = https://gitlab.com/
+[url "git@codeberg.org:"]
+	insteadOf = https://codeberg.org/
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[url "git@gitea.com:"]
+	insteadOf = https://gitea.com/
+

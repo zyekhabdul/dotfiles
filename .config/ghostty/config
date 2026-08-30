@@ -1,0 +1,67 @@
+# ==============================================================================
+# GHOSTTY TERMINAL CONFIGURATION
+# Engine: Zig Native (Low Latency, High Efficiency)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# FONT SETTINGS
+# ------------------------------------------------------------------------------
+font-family = "JetBrainsMono Nerd Font"
+font-size = 8
+font-feature = ["-calt", "-liga", "-dlig"]
+
+# ------------------------------------------------------------------------------
+# WINDOW & SCROLLBAR
+# ------------------------------------------------------------------------------
+window-padding-x = 8
+window-padding-y = 8
+window-theme = dark
+gtk-titlebar = false
+window-decoration = false
+
+# Scrollbar fisik asli yang bisa diklik & didrag
+scrollbar = system
+scrollback-limit = 100000
+
+# ------------------------------------------------------------------------------
+# CURSOR & MOUSE
+# ------------------------------------------------------------------------------
+cursor-style = block
+cursor-style-blink = true
+cursor-color = #ffffff
+cursor-text = #000000
+cursor-click-to-move = true
+shell-integration-features = no-cursor
+
+# ------------------------------------------------------------------------------
+# PITCH BLACK COLOR PALETTE (Matched with Foot & Kitty)
+# ------------------------------------------------------------------------------
+background = #000000
+foreground = #ffffff
+selection-background = #33467c
+selection-foreground = #ffffff
+
+# 16 Warna Terminal Standar
+palette = 0=#000000
+palette = 1=#ff3333
+palette = 2=#33ff33
+palette = 3=#ffaa00
+palette = 4=#55ffff
+palette = 5=#ff55ff
+palette = 6=#ffff55
+palette = 7=#ffffff
+palette = 8=#555555
+palette = 9=#ff6666
+palette = 10=#66ff66
+palette = 11=#ffbb33
+palette = 12=#aaffff
+palette = 13=#ff88ff
+palette = 14=#ffff99
+palette = 15=#ffffff
+
+# ------------------------------------------------------------------------------
+# SHELL INTEGRATION & PROTOCOLS
+# ------------------------------------------------------------------------------
+shell-integration = zsh
+copy-on-select = clipboard
+confirm-close-surface = false

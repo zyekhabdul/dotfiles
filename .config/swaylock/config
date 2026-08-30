@@ -1,0 +1,6 @@
+# Swaylock default configuration
+ignore-empty-password
+show-failed-attempts
+indicator-caps-lock
+show-keyboard-layout
+color=000000

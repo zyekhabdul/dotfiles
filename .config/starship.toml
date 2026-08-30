@@ -1,0 +1,34 @@
+# Starship Prompt Configuration for Zsh
+add_newline = false
+command_timeout = 2000
+
+format = """
+[](#a3aed2)\
+[  ](bg:#a3aed2 fg:#090c10)\
+[](fg:#a3aed2 bg:#769ff0)\
+$directory\
+[](fg:#769ff0 bg:#394260)\
+$git_branch\
+$git_status\
+[](fg:#394260 bg:#212736)\
+$character\
+"""
+
+[directory]
+style = "bg:#769ff0 fg:#090c10"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#394260 fg:#e06c75"
+format = "[ $symbol $branch ]($style)"
+
+[git_status]
+style = "bg:#394260 fg:#e5c07b"
+format = "[$all_status$ahead_behind]($style)"
+
+[character]
+success_symbol = "[ ❯](bold green)"
+error_symbol = "[ ❯](bold red)"
